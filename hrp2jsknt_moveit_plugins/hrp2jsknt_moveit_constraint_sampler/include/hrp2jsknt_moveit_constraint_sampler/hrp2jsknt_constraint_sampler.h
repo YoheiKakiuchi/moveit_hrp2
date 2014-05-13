@@ -140,7 +140,7 @@ public:
    * \param max_attempts - number of times to run IK before giving up
    * \return true if it finds a valid location for both legs
    */
-  bool calculateLegJoints(robot_state::RobotState &state, unsigned int max_attempts);
+  bool calculateLegJoints(robot_state::RobotState &state, const robot_state::RobotState &reference_state, unsigned int max_attempts);
 
   virtual bool project(robot_state::RobotState &state,
     unsigned int max_attempts);
@@ -277,15 +277,41 @@ public:
   virtual bool canService(const planning_scene::PlanningSceneConstPtr &scene, const std::string &group_name,
     const moveit_msgs::Constraints &constr) const
   {
+    logInform("hrp2jsknt_constraint_sampler: checking constraint sampler %s", group_name.c_str());
+    std::cerr << constr << std::endl;
     // do not use this sampler if there are any joint constraints, because then we are in the goal sampling stage
-    if (
-      constr.joint_constraints.size() == 0 &&
-      group_name == "whole_body")
-    {
-      logInform("hrp2jsknt_constraint_sampler: Using custom constraint sampler");
-      return true;
-    }
-
+#if 0
+    if (group_name == "whole_body")
+      {
+        if (constr.joint_constraints.size() == 0)
+          {
+            logInform("hrp2jsknt_constraint_sampler: Using custom constraint sampler");
+            return true;
+          }
+      }
+#endif
+#if 1
+    if (group_name == "whole_body")
+      {
+        if (constr.joint_constraints.size() == 0)
+          {
+            logInform("hrp2jsknt_constraint_sampler: Using custom constraint sampler");
+            return true;
+          }
+        bool virtual_joint_flag = true;
+        for (size_t i = 0; i < constr.joint_constraints.size(); i++) {
+          if (constr.joint_constraints[i].joint_name.find("/trans_") == std::string::npos &&
+              constr.joint_constraints[i].joint_name.find("/rot_") == std::string::npos ) {
+            virtual_joint_flag = false;
+            break;
+          }
+        }
+        if (virtual_joint_flag) {
+          logInform("hrp2jsknt_constraint_sampler: Using custom constraint sampler (only contain virtual joint)");
+          return true;
+        }
+      }
+#endif
     logInform("hrp2jsknt_constraint_sampler: Not using custom constraint sampler");
     return false;
   }

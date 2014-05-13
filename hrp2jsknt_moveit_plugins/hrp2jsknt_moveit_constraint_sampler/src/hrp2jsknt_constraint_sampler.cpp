@@ -52,11 +52,12 @@ bool HRP2JSKNTConstraintSampler::configure(const moveit_msgs::Constraints &const
 
   logError("Configure joint constraint sampler");
 
+  ROS_ERROR_STREAM("constraints: " << constraints);
   // HRP2JSKNT custom constraints: define here --------------------
   moveit_msgs::JointConstraint jc1;
   moveit_msgs::OrientationConstraint oc1;
 
-  double workspace = 1;
+  double workspace = 0.15;
 
   // X
   jc1.joint_name = "virtual_joint/trans_x";
@@ -89,14 +90,14 @@ bool HRP2JSKNTConstraintSampler::configure(const moveit_msgs::Constraints &const
   oc1.orientation.y = 0;
   oc1.orientation.z = 0;
   oc1.orientation.w = 1;
-  oc1.absolute_x_axis_tolerance = 0.001;
-  oc1.absolute_y_axis_tolerance = 0.001;
-  oc1.absolute_z_axis_tolerance = 0.001;
-  /*  TODO re-enable this
-      oc1.absolute_x_axis_tolerance = 0.34906585;  // 20 degrees
-      oc1.absolute_y_axis_tolerance = 0.34906585;
-      oc1.absolute_z_axis_tolerance = 0.34906585;
-  */
+  //oc1.absolute_x_axis_tolerance = 0.001;
+  //oc1.absolute_y_axis_tolerance = 0.001;
+  //oc1.absolute_z_axis_tolerance = 0.001;
+  /*  TODO re-enable this */
+  oc1.absolute_x_axis_tolerance = 0.2618;  // 15 degrees
+  oc1.absolute_y_axis_tolerance = 0.2618;  // 15 degrees
+  oc1.absolute_z_axis_tolerance = 0.2618;  // 15 degrees
+
   oc1.weight = 1;
   constraints.orientation_constraints.push_back(oc1);
 
@@ -231,28 +232,115 @@ bool HRP2JSKNTConstraintSampler::configure(const std::vector<kinematic_constrain
 
   // Create publishers for rviz
   ros::NodeHandle nh_("~");
-  robot_state_publisher_ = nh_.advertise<moveit_msgs::DisplayRobotState>( "/hrp2_demos", 1 );
+  robot_state_publisher_ = nh_.advertise<moveit_msgs::DisplayRobotState>( "/hrp2_demos", 1 ); //
 
-  left_leg_ = scene_->getRobotModel()->getJointModelGroup("left_leg");
-  right_leg_ = scene_->getRobotModel()->getJointModelGroup("right_leg");
+  left_leg_ = scene_->getRobotModel()->getJointModelGroup("left_leg");   // left_leg_joint_group
+  right_leg_ = scene_->getRobotModel()->getJointModelGroup("right_leg"); // right_leg_joint_group
 
   // Create a default robot state so that we can record its foot positions
   moveit::core::RobotState goal_state(scene_->getRobotModel());
   goal_state.setToDefaultValues();
 
   // Get state of feet
-  left_foot_position_ = goal_state.getGlobalLinkTransform("LLEG_LINK5");
-  right_foot_position_ = goal_state.getGlobalLinkTransform("RLEG_LINK5");
+  left_foot_position_ = goal_state.getGlobalLinkTransform("LLEG_LINK5");  // left_leg_tip_link
+  right_foot_position_ = goal_state.getGlobalLinkTransform("RLEG_LINK5"); // right_leg_tip_link
   // ------------------------------------------------------------------------
 
   //logWarn("%s finished configuring", sampler_name_.c_str());
   return true;
 }
 
+void printState(const robot_state::RobotState &state, const std::string &str) {
+  {
+    const double *p;
+    p = state.getJointPositions("virtual_joint");
+    std::cerr << "(list " << str << " #f(" << 1000 * p[0] << " ";
+    std::cerr << 1000 * p[1] << " ";
+    std::cerr << 1000 * p[2] << ") #f(";
+    std::cerr << p[6] << " ";
+    std::cerr << p[3] << " ";
+    std::cerr << p[4] << " ";
+    std::cerr << p[5] << ") #f(";
+
+    p = state.getJointPositions("RLEG_JOINT0");
+    std::cerr << 180 / M_PI * p[0] << " ";
+    p = state.getJointPositions("RLEG_JOINT1");
+    std::cerr << 180 / M_PI * p[0] << " ";
+    p = state.getJointPositions("RLEG_JOINT2");
+    std::cerr << 180 / M_PI * p[0] << " ";
+    p = state.getJointPositions("RLEG_JOINT3");
+    std::cerr << 180 / M_PI * p[0] << " ";
+    p = state.getJointPositions("RLEG_JOINT4");
+    std::cerr << 180 / M_PI * p[0] << " ";
+    p = state.getJointPositions("RLEG_JOINT5");
+    std::cerr << 180 / M_PI * p[0] << " ";
+    p = state.getJointPositions("RLEG_JOINT6");
+    std::cerr << 180 / M_PI * p[0] << " ";
+
+    p = state.getJointPositions("LLEG_JOINT0");
+    std::cerr << 180 / M_PI * p[0] << " ";
+    p = state.getJointPositions("LLEG_JOINT1");
+    std::cerr << 180 / M_PI * p[0] << " ";
+    p = state.getJointPositions("LLEG_JOINT2");
+    std::cerr << 180 / M_PI * p[0] << " ";
+    p = state.getJointPositions("LLEG_JOINT3");
+    std::cerr << 180 / M_PI * p[0] << " ";
+    p = state.getJointPositions("LLEG_JOINT4");
+    std::cerr << 180 / M_PI * p[0] << " ";
+    p = state.getJointPositions("LLEG_JOINT5");
+    std::cerr << 180 / M_PI * p[0] << " ";
+    p = state.getJointPositions("LLEG_JOINT6");
+    std::cerr << 180 / M_PI * p[0] << " ";
+
+    p = state.getJointPositions("CHEST_JOINT0");
+    std::cerr << 180 / M_PI * p[0] << " ";
+    p = state.getJointPositions("CHEST_JOINT1");
+    std::cerr << 180 / M_PI * p[0] << " ";
+    p = state.getJointPositions("HEAD_JOINT0");
+    std::cerr << 180 / M_PI * p[0] << " ";
+    p = state.getJointPositions("HEAD_JOINT1");
+    std::cerr << 180 / M_PI * p[0] << " ";
+
+    p = state.getJointPositions("RARM_JOINT0");
+    std::cerr << 180 / M_PI * p[0] << " ";
+    p = state.getJointPositions("RARM_JOINT1");
+    std::cerr << 180 / M_PI * p[0] << " ";
+    p = state.getJointPositions("RARM_JOINT2");
+    std::cerr << 180 / M_PI * p[0] << " ";
+    p = state.getJointPositions("RARM_JOINT3");
+    std::cerr << 180 / M_PI * p[0] << " ";
+    p = state.getJointPositions("RARM_JOINT4");
+    std::cerr << 180 / M_PI * p[0] << " ";
+    p = state.getJointPositions("RARM_JOINT5");
+    std::cerr << 180 / M_PI * p[0] << " ";
+    p = state.getJointPositions("RARM_JOINT6");
+    std::cerr << 180 / M_PI * p[0] << " ";
+    std::cerr << "0 "; // RARM_JOINT7
+    p = state.getJointPositions("LARM_JOINT0");
+    std::cerr << 180 / M_PI * p[0] << " ";
+    p = state.getJointPositions("LARM_JOINT1");
+    std::cerr << 180 / M_PI * p[0] << " ";
+    p = state.getJointPositions("LARM_JOINT2");
+    std::cerr << 180 / M_PI * p[0] << " ";
+    p = state.getJointPositions("LARM_JOINT3");
+    std::cerr << 180 / M_PI * p[0] << " ";
+    p = state.getJointPositions("LARM_JOINT4");
+    std::cerr << 180 / M_PI * p[0] << " ";
+    p = state.getJointPositions("LARM_JOINT5");
+    std::cerr << 180 / M_PI * p[0] << " ";
+    p = state.getJointPositions("LARM_JOINT6");
+    std::cerr << 180 / M_PI * p[0] << " ";
+
+    std::cerr << "0))" << std::endl;  // LARM_JOINT7
+  }
+}
+
 bool HRP2JSKNTConstraintSampler::sample(robot_state::RobotState &state,
-  const robot_state::RobotState & /* reference_state */,
-  unsigned int max_attempts)
+                                        const robot_state::RobotState &reference_state,
+                                        unsigned int max_attempts)
 {
+  printState(reference_state, ":reference");
+
   if (!jmg_)
     logError("no joint model group loaded");
 
@@ -265,7 +353,7 @@ bool HRP2JSKNTConstraintSampler::sample(robot_state::RobotState &state,
   logWarn("%s HRP2JSKNTConstraintSampler SAMPLING -----------------------------",sampler_name_.c_str());
 
   // Try 10 times
-  for (std::size_t i = 0; i < 10; ++i)
+  for (std::size_t i = 0; i < 14; ++i)
   {
     logInform("Sampling attempt number %d", i);
 
@@ -291,7 +379,7 @@ bool HRP2JSKNTConstraintSampler::sample(robot_state::RobotState &state,
     //ros::Duration(1.0).sleep();
 
     // Now do IK to find leg position
-    if (calculateLegJoints(state, max_attempts))
+    if (calculateLegJoints(state, reference_state, max_attempts))
     {
       // We found a valid location for both feet!
 
@@ -300,7 +388,7 @@ bool HRP2JSKNTConstraintSampler::sample(robot_state::RobotState &state,
       //displayRobotState(state);
       //logInform("done display robot state");
       //ros::Duration(1.0).sleep();
-
+      printState(state, ":return");
       return true;
     }
   }
@@ -372,34 +460,79 @@ bool HRP2JSKNTConstraintSampler::sampleOrientationConstraints(robot_state::Robot
     quat = Eigen::Quaterniond(rt.rotation());
   }
 
+  ROS_ERROR("rot: %f %f %f %f", quat.w(), quat.x(), quat.y(), quat.z());
   // Now set the virtual joint quaternion to this result
   state.setVariablePosition("virtual_joint/rot_x", quat.x());
   state.setVariablePosition("virtual_joint/rot_y", quat.y());
-  state.setVariablePosition("virtual_joint/rot_z", quat.x());
+  state.setVariablePosition("virtual_joint/rot_z", quat.z());
   state.setVariablePosition("virtual_joint/rot_w", quat.w());
 
   return true;
 }
 
-bool HRP2JSKNTConstraintSampler::calculateLegJoints(robot_state::RobotState &state, unsigned int max_attempts)
+bool HRP2JSKNTConstraintSampler::calculateLegJoints(robot_state::RobotState &state,
+                                                    const robot_state::RobotState &reference_state,
+                                                    unsigned int max_attempts)
 {
-
+  //printState(reference_state, ":calc-leg");
   // Move feet positions to be directly under torso, in a regular parallel position, squatting if necessary
-  const Eigen::Affine3d &base_link = state.getJointTransform("virtual_joint");
+  const Eigen::Affine3d &base_link = reference_state.getJointTransform("virtual_joint");
   const Eigen::Translation3d floor_z(0,0,-base_link.translation().z());
+  ROS_ERROR("base_link");
+  ROS_ERROR("%f %f %f %f", base_link(0,0), base_link(0,1), base_link(0,2), base_link(0,3));
+  ROS_ERROR("%f %f %f %f", base_link(1,0), base_link(1,1), base_link(1,2), base_link(1,3));
+  ROS_ERROR("%f %f %f %f", base_link(2,0), base_link(2,1), base_link(2,2), base_link(2,3));
+  ROS_ERROR("%f %f %f %f", base_link(3,0), base_link(3,1), base_link(3,2), base_link(3,3));
+
+  ROS_ERROR("left_foot");
+  ROS_ERROR("%f %f %f %f", left_foot_position_(0,0), left_foot_position_(0,1), left_foot_position_(0,2), left_foot_position_(0,3));
+  ROS_ERROR("%f %f %f %f", left_foot_position_(1,0), left_foot_position_(1,1), left_foot_position_(1,2), left_foot_position_(1,3));
+  ROS_ERROR("%f %f %f %f", left_foot_position_(2,0), left_foot_position_(2,1), left_foot_position_(2,2), left_foot_position_(2,3));
+  ROS_ERROR("%f %f %f %f", left_foot_position_(3,0), left_foot_position_(3,1), left_foot_position_(3,2), left_foot_position_(3,3));
 
   // First move the standard foot positions to under the current virtual_joint
   left_foot_position_new_ = floor_z * base_link * left_foot_position_;
   // Then move the z-axis up level with the floor
   right_foot_position_new_ = floor_z * base_link * right_foot_position_;
 
+  ROS_ERROR("left_foot_position_new_");
+  ROS_ERROR("%f %f %f %f", left_foot_position_new_(0,0), left_foot_position_new_(0,1), left_foot_position_new_(0,2), left_foot_position_new_(0,3));
+  ROS_ERROR("%f %f %f %f", left_foot_position_new_(1,0), left_foot_position_new_(1,1), left_foot_position_new_(1,2), left_foot_position_new_(1,3));
+  ROS_ERROR("%f %f %f %f", left_foot_position_new_(2,0), left_foot_position_new_(2,1), left_foot_position_new_(2,2), left_foot_position_new_(2,3));
+  ROS_ERROR("%f %f %f %f", left_foot_position_new_(3,0), left_foot_position_new_(3,1), left_foot_position_new_(3,2), left_foot_position_new_(3,3));
+  // test ik server / ....
+#if 0
+  moveit_msgs::GetPositionIK ik_srv;
+  ik_srv.request.ik_request.avoid_collisions = true;
+  ik_srv.request.ik_request.group_name = "whole_body";
+
+  // Copy seed state into virtual robot state and convert into moveit_msg
+  moveit::core::robotStateToRobotStateMsg(referece_state, ik_srv.request.ik_request.robot_state);
+
+  // Load the poses into the request in difference places depending if there is more than one or not
+  geometry_msgs::PoseStamped ik_pose_st;
+  ik_pose_st.header.frame_id = "odom";
+  //ik_srv.request.ik_request.pose_stamped = ik_pose_st;
+  ik_srv.request.ik_request.ik_link_name = "";
+
+  ik_pose_st.pose = ik_poses[i];
+  ik_srv.request.ik_request.pose_stamped_vector.push_back(ik_pose_st);
+  ik_srv.request.ik_request.ik_link_names.push_back("RARM_LINK6");
+
+  ik_pose_st.pose = ik_poses[i];
+  ik_srv.request.ik_request.pose_stamped_vector.push_back(ik_pose_st);
+  ik_srv.request.ik_request.ik_link_names.push_back("LARM_LINK6");
+
+#endif
   // solve for one leg
-  if (state.setFromIK(left_leg_, left_foot_position_new_, max_attempts, 0.1))
+  //if (state.setFromIK(left_leg_, left_foot_position_new_, max_attempts, 0.1))
+  if (state.setFromIK(left_leg_, left_foot_position_, max_attempts, 0.04))
   {
     //logInform("Found IK Solution for left!");
 
     // solve for other leg
-    if (state.setFromIK(right_leg_, right_foot_position_new_, max_attempts, 0.1))
+    //if (state.setFromIK(right_leg_, right_foot_position_new_, max_attempts, 0.1))
+    if (state.setFromIK(right_leg_, right_foot_position_, max_attempts, 0.04))
     {
       logInform("Found IK Solution for BOTH!");
     }
