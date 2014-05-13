@@ -1,0 +1,144 @@
+controller_list:
+  - name: fake_larm_controller
+    joints:
+      - LARM_JOINT0
+      - LARM_JOINT1
+      - LARM_JOINT2
+      - LARM_JOINT3
+      - LARM_JOINT4
+      - LARM_JOINT5
+      - LARM_JOINT6
+      - LARM_JOINT7
+  - name: fake_rarm_controller
+    joints:
+      - RARM_JOINT0
+      - RARM_JOINT1
+      - RARM_JOINT2
+      - RARM_JOINT3
+      - RARM_JOINT4
+      - RARM_JOINT5
+      - RARM_JOINT6
+      - RARM_JOINT7
+  - name: fake_left_leg_controller
+    joints:
+      - LLEG_JOINT0
+      - LLEG_JOINT1
+      - LLEG_JOINT2
+      - LLEG_JOINT3
+      - LLEG_JOINT4
+      - LLEG_JOINT5
+  - name: fake_right_leg_controller
+    joints:
+      - RLEG_JOINT0
+      - RLEG_JOINT1
+      - RLEG_JOINT2
+      - RLEG_JOINT3
+      - RLEG_JOINT4
+      - RLEG_JOINT5
+  - name: fake_torso_controller
+    joints:
+      - CHEST_JOINT0
+      - CHEST_JOINT1
+  - name: fake_larm_torso_controller
+    joints:
+      - CHEST_JOINT0
+      - CHEST_JOINT1
+      - LARM_JOINT0
+      - LARM_JOINT1
+      - LARM_JOINT2
+      - LARM_JOINT3
+      - LARM_JOINT4
+      - LARM_JOINT5
+      - LARM_JOINT6
+      - LARM_JOINT7
+  - name: fake_rarm_torso_controller
+    joints:
+      - CHEST_JOINT0
+      - CHEST_JOINT1
+      - RARM_JOINT0
+      - RARM_JOINT1
+      - RARM_JOINT2
+      - RARM_JOINT3
+      - RARM_JOINT4
+      - RARM_JOINT5
+      - RARM_JOINT6
+      - RARM_JOINT7
+  - name: fake_both_arm_controller
+    joints:
+      - LARM_JOINT0
+      - LARM_JOINT1
+      - LARM_JOINT2
+      - LARM_JOINT3
+      - LARM_JOINT4
+      - LARM_JOINT5
+      - LARM_JOINT6
+      - LARM_JOINT7
+      - RARM_JOINT0
+      - RARM_JOINT1
+      - RARM_JOINT2
+      - RARM_JOINT3
+      - RARM_JOINT4
+      - RARM_JOINT5
+      - RARM_JOINT6
+      - RARM_JOINT7
+  - name: fake_both_arm_torso_controller
+    joints:
+      - CHEST_JOINT0
+      - CHEST_JOINT1
+      - LARM_JOINT0
+      - LARM_JOINT1
+      - LARM_JOINT2
+      - LARM_JOINT3
+      - LARM_JOINT4
+      - LARM_JOINT5
+      - LARM_JOINT6
+      - LARM_JOINT7
+      - RARM_JOINT0
+      - RARM_JOINT1
+      - RARM_JOINT2
+      - RARM_JOINT3
+      - RARM_JOINT4
+      - RARM_JOINT5
+      - RARM_JOINT6
+      - RARM_JOINT7
+  - name: fake_whole_body_controller
+    joints:
+      - virtual_joint
+      - CHEST_JOINT0
+      - CHEST_JOINT1
+      - HEAD_JOINT0
+      - HEAD_JOINT1
+      - LARM_JOINT0
+      - LARM_JOINT1
+      - LARM_JOINT2
+      - LARM_JOINT3
+      - LARM_JOINT4
+      - LARM_JOINT5
+      - LARM_JOINT6
+      - LARM_JOINT7
+      - RARM_JOINT0
+      - RARM_JOINT1
+      - RARM_JOINT2
+      - RARM_JOINT3
+      - RARM_JOINT4
+      - RARM_JOINT5
+      - RARM_JOINT6
+      - RARM_JOINT7
+      - LLEG_JOINT0
+      - LLEG_JOINT1
+      - LLEG_JOINT2
+      - LLEG_JOINT3
+      - LLEG_JOINT4
+      - LLEG_JOINT5
+      - RLEG_JOINT0
+      - RLEG_JOINT1
+      - RLEG_JOINT2
+      - RLEG_JOINT3
+      - RLEG_JOINT4
+      - RLEG_JOINT5
+  - name: fake_LARM_EEF_controller
+    joints:
+      []
+  - name: fake_RARM_EEF_controller
+    joints:
+      []

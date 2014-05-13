@@ -1,0 +1,44 @@
+larm:
+  kinematics_solver: kdl_kinematics_plugin/KDLKinematicsPlugin
+  kinematics_solver_search_resolution: 0.005
+  kinematics_solver_timeout: 0.005
+  kinematics_solver_attempts: 3
+rarm:
+  kinematics_solver: kdl_kinematics_plugin/KDLKinematicsPlugin
+  kinematics_solver_search_resolution: 0.005
+  kinematics_solver_timeout: 0.005
+  kinematics_solver_attempts: 3
+torso:
+  kinematics_solver: kdl_kinematics_plugin/KDLKinematicsPlugin
+  kinematics_solver_search_resolution: 0.005
+  kinematics_solver_timeout: 0.005
+  kinematics_solver_attempts: 3
+larm_torso:
+  kinematics_solver: kdl_kinematics_plugin/KDLKinematicsPlugin
+  kinematics_solver_search_resolution: 0.005
+  kinematics_solver_timeout: 0.005
+  kinematics_solver_attempts: 3
+rarm_torso:
+  kinematics_solver: kdl_kinematics_plugin/KDLKinematicsPlugin
+  kinematics_solver_search_resolution: 0.005
+  kinematics_solver_timeout: 0.005
+  kinematics_solver_attempts: 3
+both_arm:
+  kinematics_solver: kdl_kinematics_plugin/KDLKinematicsPlugin
+  kinematics_solver_search_resolution: 0.005
+  kinematics_solver_timeout: 0.005
+  kinematics_solver_attempts: 3
+both_arm_torso:
+  kinematics_solver: kdl_kinematics_plugin/KDLKinematicsPlugin
+  kinematics_solver_search_resolution: 0.005
+  kinematics_solver_timeout: 0.005
+  kinematics_solver_attempts: 3
+whole_body: # [attention] Group_name should be "whole_body" because of IK server requirement.
+  kinematics_solver: srv_kinematics_plugin/SrvKinematicsPlugin
+  kinematics_solver_search_resolution: 0.005
+  kinematics_solver_timeout: 0.5
+  kinematics_solver_attempts: 1
+  kinematics_solver_ik_links:
+    - RARM_LINK7
+    - LARM_LINK7
+  kinematics_solver_service_name: /solve_ik

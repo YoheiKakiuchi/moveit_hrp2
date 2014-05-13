@@ -43,6 +43,8 @@
 #include <eigen_conversions/eigen_msg.h>
 #include <boost/bind.hpp>
 
+#include <moveit_msgs/GetPositionIK.h>
+
 namespace hrp2jsknt_moveit_constraint_sampler
 {
 
@@ -470,44 +472,40 @@ bool HRP2JSKNTConstraintSampler::sampleOrientationConstraints(robot_state::Robot
   return true;
 }
 
+#define printEigenMat(str, mat) \
+  ROS_ERROR(str); \
+  ROS_ERROR("%f %f %f %f", mat(0,0), mat(0,1), mat(0,2), mat(0,3)); \
+  ROS_ERROR("%f %f %f %f", mat(1,0), mat(1,1), mat(1,2), mat(1,3)); \
+  ROS_ERROR("%f %f %f %f", mat(2,0), mat(2,1), mat(2,2), mat(2,3)); \
+  ROS_ERROR("%f %f %f %f", mat(3,0), mat(3,1), mat(3,2), mat(3,3));
+
 bool HRP2JSKNTConstraintSampler::calculateLegJoints(robot_state::RobotState &state,
                                                     const robot_state::RobotState &reference_state,
                                                     unsigned int max_attempts)
 {
-  //printState(reference_state, ":calc-leg");
+  printState(state, ":calc-leg");
   // Move feet positions to be directly under torso, in a regular parallel position, squatting if necessary
   const Eigen::Affine3d &base_link = reference_state.getJointTransform("virtual_joint");
   const Eigen::Translation3d floor_z(0,0,-base_link.translation().z());
-  ROS_ERROR("base_link");
-  ROS_ERROR("%f %f %f %f", base_link(0,0), base_link(0,1), base_link(0,2), base_link(0,3));
-  ROS_ERROR("%f %f %f %f", base_link(1,0), base_link(1,1), base_link(1,2), base_link(1,3));
-  ROS_ERROR("%f %f %f %f", base_link(2,0), base_link(2,1), base_link(2,2), base_link(2,3));
-  ROS_ERROR("%f %f %f %f", base_link(3,0), base_link(3,1), base_link(3,2), base_link(3,3));
 
-  ROS_ERROR("left_foot");
-  ROS_ERROR("%f %f %f %f", left_foot_position_(0,0), left_foot_position_(0,1), left_foot_position_(0,2), left_foot_position_(0,3));
-  ROS_ERROR("%f %f %f %f", left_foot_position_(1,0), left_foot_position_(1,1), left_foot_position_(1,2), left_foot_position_(1,3));
-  ROS_ERROR("%f %f %f %f", left_foot_position_(2,0), left_foot_position_(2,1), left_foot_position_(2,2), left_foot_position_(2,3));
-  ROS_ERROR("%f %f %f %f", left_foot_position_(3,0), left_foot_position_(3,1), left_foot_position_(3,2), left_foot_position_(3,3));
+  printEigenMat("base_link", base_link);
+  printEigenMat("left_foot", left_foot_position_);
 
   // First move the standard foot positions to under the current virtual_joint
   left_foot_position_new_ = floor_z * base_link * left_foot_position_;
   // Then move the z-axis up level with the floor
   right_foot_position_new_ = floor_z * base_link * right_foot_position_;
 
-  ROS_ERROR("left_foot_position_new_");
-  ROS_ERROR("%f %f %f %f", left_foot_position_new_(0,0), left_foot_position_new_(0,1), left_foot_position_new_(0,2), left_foot_position_new_(0,3));
-  ROS_ERROR("%f %f %f %f", left_foot_position_new_(1,0), left_foot_position_new_(1,1), left_foot_position_new_(1,2), left_foot_position_new_(1,3));
-  ROS_ERROR("%f %f %f %f", left_foot_position_new_(2,0), left_foot_position_new_(2,1), left_foot_position_new_(2,2), left_foot_position_new_(2,3));
-  ROS_ERROR("%f %f %f %f", left_foot_position_new_(3,0), left_foot_position_new_(3,1), left_foot_position_new_(3,2), left_foot_position_new_(3,3));
+  printEigenMat("left_foot_new_", left_foot_position_new_);
+
+#if 1
   // test ik server / ....
-#if 0
   moveit_msgs::GetPositionIK ik_srv;
   ik_srv.request.ik_request.avoid_collisions = true;
   ik_srv.request.ik_request.group_name = "whole_body";
 
   // Copy seed state into virtual robot state and convert into moveit_msg
-  moveit::core::robotStateToRobotStateMsg(referece_state, ik_srv.request.ik_request.robot_state);
+  moveit::core::robotStateToRobotStateMsg(reference_state, ik_srv.request.ik_request.robot_state);
 
   // Load the poses into the request in difference places depending if there is more than one or not
   geometry_msgs::PoseStamped ik_pose_st;
@@ -515,11 +513,24 @@ bool HRP2JSKNTConstraintSampler::calculateLegJoints(robot_state::RobotState &sta
   //ik_srv.request.ik_request.pose_stamped = ik_pose_st;
   ik_srv.request.ik_request.ik_link_name = "";
 
-  ik_pose_st.pose = ik_poses[i];
+  const Eigen::Affine3d e_rcds = state.getGlobalLinkTransform("RARM_LINK6");
+  const Eigen::Affine3d e_lcds = state.getGlobalLinkTransform("LARM_LINK6");
+  //const Eigen::Affine3d e_odom = state.getGlobalLinkTransform("odom");
+  const Eigen::Affine3d e_body = state.getGlobalLinkTransform("BODY");
+
+  printEigenMat("rcds", e_rcds);
+  //printEigenMat("e_odom", e_odom);
+  printEigenMat("e_body", e_body);
+
+  geometry_msgs::Pose rcds, lcds;
+  tf::poseEigenToMsg(state.getGlobalLinkTransform("RARM_LINK6"), rcds);
+  tf::poseEigenToMsg(state.getGlobalLinkTransform("LARM_LINK6"), lcds);
+
+  //ik_pose_st.pose = //ik_poses[i];
   ik_srv.request.ik_request.pose_stamped_vector.push_back(ik_pose_st);
   ik_srv.request.ik_request.ik_link_names.push_back("RARM_LINK6");
 
-  ik_pose_st.pose = ik_poses[i];
+  //ik_pose_st.pose = //ik_poses[i];
   ik_srv.request.ik_request.pose_stamped_vector.push_back(ik_pose_st);
   ik_srv.request.ik_request.ik_link_names.push_back("LARM_LINK6");
 
