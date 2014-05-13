@@ -1,0 +1,10 @@
+<library path="libstaro_moveit_constraint_sampler">
+
+  <class name="staro_moveit_constraint_sampler/STAROConstraintSamplerAllocator"
+         type="staro_moveit_constraint_sampler::STAROConstraintSamplerAllocator"
+         base_class_type="constraint_samplers::ConstraintSamplerAllocator" >
+    <description>
+    </description>
+  </class>
+
+</library>
