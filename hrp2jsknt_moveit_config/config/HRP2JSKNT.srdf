@@ -77,14 +77,14 @@
         <joint name="LLEG_JOINT3" />
         <joint name="LLEG_JOINT4" />
         <joint name="LLEG_JOINT5" />
-        <joint name="LLEG_JOINT6" />
+        <!--joint name="LLEG_JOINT6" /-->
         <joint name="RLEG_JOINT0" />
         <joint name="RLEG_JOINT1" />
         <joint name="RLEG_JOINT2" />
         <joint name="RLEG_JOINT3" />
         <joint name="RLEG_JOINT4" />
         <joint name="RLEG_JOINT5" />
-        <joint name="RLEG_JOINT6" />
+        <!--joint name="RLEG_JOINT6" /-->
     </group>
     <group name="left_hand">
         <link name="L_INDEXMP_R_LINK" />
@@ -185,7 +185,7 @@
         <joint name="LLEG_JOINT3" value="1.47581" />
         <joint name="LLEG_JOINT4" value="-0.755378" />
         <joint name="LLEG_JOINT5" value="-0.004331" />
-        <joint name="LLEG_JOINT6" value="0.0" />
+        <!--joint name="LLEG_JOINT6" value="0.0" /-->
         <joint name="RARM_JOINT0" value="0.144011" />
         <joint name="RARM_JOINT1" value="-0.173863" />
         <joint name="RARM_JOINT2" value="0.002969" />
@@ -199,7 +199,7 @@
         <joint name="RLEG_JOINT3" value="1.47731" />
         <joint name="RLEG_JOINT4" value="-0.756109" />
         <joint name="RLEG_JOINT5" value="-0.004324" />
-        <joint name="RLEG_JOINT6" value="0.0" />
+        <!--joint name="RLEG_JOINT6" value="0.0" /-->
     </group_state>
     <!--END EFFECTOR: Purpose: Represent information about an end effector.-->
     <end_effector name="right_eef" parent_link="RARM_LINK6" group="right_hand" parent_group="right_arm" />
@@ -207,8 +207,8 @@
     <end_effector name="left_foot" parent_link="LLEG_LINK5" group="left_foot" parent_group="left_leg" />
     <end_effector name="right_foot" parent_link="RLEG_LINK5" group="right_foot" parent_group="right_leg" />
     <!--VIRTUAL JOINT: Purpose: this element defines a virtual joint between a robot link and an external frame of reference (considered fixed with respect to the robot)-->
-    <virtual_joint name="virtual_joint" type="floating" parent_frame="/odom" child_link="BODY" />
-    <virtual_joint name="foot_virtual" type="fixed" parent_frame="/odom" child_link="LLEG_LINK6" />
+    <virtual_joint name="virtual_joint" type="floating" parent_frame="/moveit_base" child_link="BODY" />
+    <virtual_joint name="foot_virtual" type="fixed" parent_frame="/moveit_base" child_link="LLEG_LINK6" />
     <!--PASSIVE JOINT: Purpose: this element is used to mark joints that are not actuated-->
     <passive_joint name="virtual_joint" />
     <!--DISABLE COLLISIONS: By default it is assumed that any link of the robot could potentially come into collision with any other link in the robot. This tag disables collision checking between a specified pair of links. -->
