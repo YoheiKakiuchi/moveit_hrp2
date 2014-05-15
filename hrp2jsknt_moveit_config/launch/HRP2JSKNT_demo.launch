@@ -1,6 +1,6 @@
 <launch>
   <arg name="LOAD_ROBOT_DESCRIPTION" default="true" />
-  <arg name="PUBLISH_BASE_TF" default="true" />
+  <arg name="PUBLISH_BASE_TF" default="false" />
   <arg name="ALLOW_TRAJECTORY" default="true" />
   <arg name="RUN_RVIZ" default="true" />
   <arg name="RUN_DATABASE" default="false" />
@@ -10,9 +10,10 @@
     <arg name="load_robot_description" value="$(arg LOAD_ROBOT_DESCRIPTION)"/>
   </include>
 
+  <!-- tf should publish based on foot and root position -->
   <node if="$(arg PUBLISH_BASE_TF)"
         pkg="tf" type="static_transform_publisher" name="virtual_joint_broadcaster_0"
-        args="0 0 0.7 0 0 0 /odom /moveit_base 100" />
+        args="0 0 1.7 0 0 0 /odom /moveit_base 100" />
 
   <include file="$(find hrp2jsknt_moveit_config)/launch/move_group.launch">
     <arg name="allow_trajectory_execution" value="$(arg ALLOW_TRAJECTORY)"/>
