@@ -54,7 +54,7 @@ controller_list:
     joints:
       - CHEST_JOINT0
       - CHEST_JOINT1
-  - name: fullbody_without_head_controller
+  - name: fullbody_controller
     action_ns: follow_joint_trajectory_action
     type: FollowJointTrajectory
     default: true

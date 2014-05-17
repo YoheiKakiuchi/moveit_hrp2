@@ -535,13 +535,12 @@ bool HRP2JSKNTConstraintSampler::calculateLegJoints(robot_state::RobotState &sta
 
   // Load the poses into the request in difference places depending if there is more than one or not
   geometry_msgs::PoseStamped ik_pose_st;
-  ik_pose_st.header.frame_id = "odom";
+  ik_pose_st.header.frame_id = "moveit_base"; //
   //ik_srv.request.ik_request.pose_stamped = ik_pose_st;
   ik_srv.request.ik_request.ik_link_name = "";
 
   const Eigen::Affine3d e_rcds = state.getGlobalLinkTransform("RARM_LINK6");
   const Eigen::Affine3d e_lcds = state.getGlobalLinkTransform("LARM_LINK6");
-  //const Eigen::Affine3d e_odom = state.getGlobalLinkTransform("odom");
   const Eigen::Affine3d e_body = state.getGlobalLinkTransform("BODY");
 
   printEigenMat("rcds", e_rcds);

@@ -1,0 +1,15 @@
+<launch>
+  <arg name="REAL" default="true" />
+
+  <include file="$(find jsk_ik_server)/launch/hrp2jsknt-ik-server.launch" />
+
+  <include if    ="$(arg REAL)"
+           file="$(find hrp2jsknt_moveit_config)/launch/HRP2JSKNT_demo.launch">
+    <arg name="PUBLISH_BASE_TF" value="false" />
+  </include>
+  <include unless="$(arg REAL)"
+           file="$(find hrp2jsknt_moveit_config)/launch/demo.launch">
+    <arg name="PUBLISH_BASE_TF" value="false" />
+  </include>
+
+</launch>

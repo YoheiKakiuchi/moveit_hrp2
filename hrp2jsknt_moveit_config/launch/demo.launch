@@ -6,13 +6,17 @@
   <!-- By default, we are not in debug mode -->
   <arg name="debug" default="false" />
 
+  <arg name="PUBLISH_BASE_TF" default="false" />
+
   <!-- Load the URDF, SRDF and other .yaml configuration files on the param server -->
   <include file="$(find hrp2jsknt_moveit_config)/launch/planning_context.launch">
     <arg name="load_robot_description" value="true"/>
   </include>
 
   <!-- If needed, broadcast static tf for robot root -->
-  <node pkg="tf" type="static_transform_publisher" name="virtual_joint_broadcaster_0" args="0 0 0 0 0 0 /odom BODY 100" />
+  <node if="$(arg PUBLISH_BASE_TF)"
+        pkg="tf" type="static_transform_publisher" name="virtual_joint_broadcaster_0"
+        args="0 0 0 0 0 0 /moveit_base BODY 100" />
 
   <!-- We do not have a robot connected, so publish fake joint states -->
   <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
