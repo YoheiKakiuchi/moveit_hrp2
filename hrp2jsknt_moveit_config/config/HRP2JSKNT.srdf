@@ -210,7 +210,7 @@
     <virtual_joint name="virtual_joint" type="floating" parent_frame="/moveit_base" child_link="BODY" />
     <!--virtual_joint name="foot_virtual" type="fixed" parent_frame="/moveit_base" child_link="LLEG_LINK6" /-->
     <!--PASSIVE JOINT: Purpose: this element is used to mark joints that are not actuated-->
-    <!--passive_joint name="virtual_joint" /-->
+    <passive_joint name="virtual_joint" />
     <!--DISABLE COLLISIONS: By default it is assumed that any link of the robot could potentially come into collision with any other link in the robot. This tag disables collision checking between a specified pair of links. -->
     <disable_collisions link1="BODY" link2="CHEST_LINK0" reason="Adjacent" />
     <disable_collisions link1="BODY" link2="HEAD_LINK0" reason="Never" />
