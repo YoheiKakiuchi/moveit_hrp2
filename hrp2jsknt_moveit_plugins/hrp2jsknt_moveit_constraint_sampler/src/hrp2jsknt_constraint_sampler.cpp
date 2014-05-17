@@ -43,8 +43,6 @@
 #include <eigen_conversions/eigen_msg.h>
 #include <boost/bind.hpp>
 
-#include <moveit_msgs/GetPositionIK.h>
-
 namespace hrp2jsknt_moveit_constraint_sampler
 {
 
@@ -59,7 +57,8 @@ bool HRP2JSKNTConstraintSampler::configure(const moveit_msgs::Constraints &const
   moveit_msgs::JointConstraint jc1;
   moveit_msgs::OrientationConstraint oc1;
 
-  double workspace = 0.15;
+  double workspace = 0.08;
+  //double workspace = 0.15;
 
   // X
   jc1.joint_name = "virtual_joint/trans_x";
@@ -81,7 +80,8 @@ bool HRP2JSKNTConstraintSampler::configure(const moveit_msgs::Constraints &const
   jc1.joint_name = "virtual_joint/trans_z";
   jc1.position = 0.0; // the default location
   jc1.tolerance_above = 0; // hrp2 cannot jump
-  jc1.tolerance_below = 0.38; // min he can crouch
+  //jc1.tolerance_below = 0.38; // min he can crouch
+  jc1.tolerance_below = 0.24; // min he can crouch
   jc1.weight = 1;
   constraints.joint_constraints.push_back(jc1);
 
@@ -96,9 +96,12 @@ bool HRP2JSKNTConstraintSampler::configure(const moveit_msgs::Constraints &const
   //oc1.absolute_y_axis_tolerance = 0.001;
   //oc1.absolute_z_axis_tolerance = 0.001;
   /*  TODO re-enable this */
-  oc1.absolute_x_axis_tolerance = 0.2618;  // 15 degrees
-  oc1.absolute_y_axis_tolerance = 0.2618;  // 15 degrees
-  oc1.absolute_z_axis_tolerance = 0.2618;  // 15 degrees
+  //oc1.absolute_x_axis_tolerance = 0.2618;  // 15 degrees
+  //oc1.absolute_y_axis_tolerance = 0.2618;  // 15 degrees
+  //oc1.absolute_z_axis_tolerance = 0.2618;  // 15 degrees
+  oc1.absolute_x_axis_tolerance = 0.174533;  // 10 degrees
+  oc1.absolute_y_axis_tolerance = 0.174533;  // 10 degrees
+  oc1.absolute_z_axis_tolerance = 0.174533;  // 10 degrees
 
   oc1.weight = 1;
   constraints.orientation_constraints.push_back(oc1);
@@ -498,6 +501,29 @@ bool HRP2JSKNTConstraintSampler::calculateLegJoints(robot_state::RobotState &sta
 
   printEigenMat("left_foot_new_", left_foot_position_new_);
 
+  // solve for one leg
+  //if (state.setFromIK(left_leg_, left_foot_position_new_, max_attempts, 0.1))
+  if (state.setFromIK(left_leg_, left_foot_position_, max_attempts, 0.04))
+  {
+    //logInform("Found IK Solution for left!");
+
+    // solve for other leg
+    //if (state.setFromIK(right_leg_, right_foot_position_new_, max_attempts, 0.1))
+    if (state.setFromIK(right_leg_, right_foot_position_, max_attempts, 0.04))
+    {
+      logInform("Found IK Solution for BOTH!");
+    }
+    else
+    {
+      logError("Did not find IK solution with %d attempts", max_attempts);
+      return false;
+    }
+  }
+  else
+  {
+    logError("Did not find IK solution with %d attempts", max_attempts);
+    return false;
+  }
 #if 1
   // test ik server / ....
   moveit_msgs::GetPositionIK ik_srv;
@@ -526,38 +552,34 @@ bool HRP2JSKNTConstraintSampler::calculateLegJoints(robot_state::RobotState &sta
   tf::poseEigenToMsg(state.getGlobalLinkTransform("RARM_LINK6"), rcds);
   tf::poseEigenToMsg(state.getGlobalLinkTransform("LARM_LINK6"), lcds);
 
-  //ik_pose_st.pose = //ik_poses[i];
+  ik_pose_st.pose = rcds;
   ik_srv.request.ik_request.pose_stamped_vector.push_back(ik_pose_st);
   ik_srv.request.ik_request.ik_link_names.push_back("RARM_LINK6");
 
-  //ik_pose_st.pose = //ik_poses[i];
+  ik_pose_st.pose = lcds;
   ik_srv.request.ik_request.pose_stamped_vector.push_back(ik_pose_st);
   ik_srv.request.ik_request.ik_link_names.push_back("LARM_LINK6");
 
-#endif
-  // solve for one leg
-  //if (state.setFromIK(left_leg_, left_foot_position_new_, max_attempts, 0.1))
-  if (state.setFromIK(left_leg_, left_foot_position_, max_attempts, 0.04))
-  {
-    //logInform("Found IK Solution for left!");
+  ik_service_client_.call(ik_srv);
+  if(ik_srv.response.error_code.val != moveit_msgs::MoveItErrorCodes::SUCCESS) {
+    ROS_DEBUG_NAMED("srv","An IK that satisifes the constraints and is collision free could not be found.");
+    switch (ik_srv.response.error_code.val) {
+      // Debug mode for failure:
+      ROS_DEBUG_STREAM("Request was: \n" << ik_srv.request.ik_request);
+      ROS_DEBUG_STREAM("Response was: \n" << ik_srv.response.solution);
 
-    // solve for other leg
-    //if (state.setFromIK(right_leg_, right_foot_position_new_, max_attempts, 0.1))
-    if (state.setFromIK(right_leg_, right_foot_position_, max_attempts, 0.04))
-    {
-      logInform("Found IK Solution for BOTH!");
+    case moveit_msgs::MoveItErrorCodes::FAILURE:
+      ROS_ERROR_STREAM_NAMED("srv","Service failed with with error code: FAILURE");
+      break;
+    case moveit_msgs::MoveItErrorCodes::NO_IK_SOLUTION:
+      ROS_ERROR_STREAM_NAMED("srv","Service failed with with error code: NO IK SOLUTION");
+      break;
+    default:
+      ROS_ERROR_STREAM_NAMED("srv","Service failed with with error code: " << ik_srv.response.error_code.val);
     }
-    else
-    {
-      logError("Did not find IK solution with %d attempts", max_attempts);
-      return false;
-    }
-  }
-  else
-  {
-    logError("Did not find IK solution with %d attempts", max_attempts);
     return false;
   }
+#endif
 
   return true;
 }

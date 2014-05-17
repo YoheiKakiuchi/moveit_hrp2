@@ -46,6 +46,7 @@
 // debug: for publishing to rviz:
 #include <moveit/robot_state/robot_state.h>
 #include <moveit_msgs/DisplayRobotState.h>
+#include <moveit_msgs/GetPositionIK.h>
 #include <moveit/robot_state/conversions.h>
 
 namespace hrp2jsknt_moveit_constraint_sampler
@@ -79,6 +80,12 @@ public:
     ConstraintSampler(scene, group_name)
   {
     logInform("constructing HRP2JSKNTConstraintSampler");
+    ros::NodeHandle nonprivate_handle("");
+    ik_service_client_ = nonprivate_handle.serviceClient<moveit_msgs::GetPositionIK>("solve_ik");
+    if (!ik_service_client_.waitForExistence(ros::Duration(0.1))) // wait 0.1 seconds, blocking
+      ROS_WARN_STREAM_NAMED("srv","Unable to connect to ROS service client with name: " << ik_service_client_.getService());
+    else
+      ROS_INFO_STREAM_NAMED("srv","Service client started with ROS service name: " << ik_service_client_.getService());
   }
   /**
    * \brief Configures a joint constraint given a Constraints message.
@@ -258,6 +265,8 @@ protected:
   // Allocate memory for storing transforms of feet
   Eigen::Affine3d left_foot_position_new_;
   Eigen::Affine3d right_foot_position_new_;
+
+  ros::ServiceClient ik_service_client_;
 };
 
 
