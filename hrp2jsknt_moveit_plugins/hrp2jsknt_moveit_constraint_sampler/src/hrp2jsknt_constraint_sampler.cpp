@@ -45,6 +45,112 @@
 
 namespace hrp2jsknt_moveit_constraint_sampler
 {
+#define DEBUG 0
+#if DEBUG
+#define printEigenMat printEigenMatInfo
+#define printState printStateError
+#define MYDEBUG_STREAM ROS_INFO_STREAM
+#else
+#define printEigenMat printEigenMatDebug
+#define printState(a, b)
+#define MYDEBUG_STREAM ROS_DEBUG_STREAM
+#endif
+
+#define printEigenMatInfo(str, mat) \
+  ROS_INFO(str); \
+  ROS_INFO("%f %f %f %f", mat(0,0), mat(0,1), mat(0,2), mat(0,3)); \
+  ROS_INFO("%f %f %f %f", mat(1,0), mat(1,1), mat(1,2), mat(1,3)); \
+  ROS_INFO("%f %f %f %f", mat(2,0), mat(2,1), mat(2,2), mat(2,3)); \
+  ROS_INFO("%f %f %f %f", mat(3,0), mat(3,1), mat(3,2), mat(3,3));
+#define printEigenMatDebug(str, mat) \
+  ROS_DEBUG(str); \
+  ROS_DEBUG("%f %f %f %f", mat(0,0), mat(0,1), mat(0,2), mat(0,3)); \
+  ROS_DEBUG("%f %f %f %f", mat(1,0), mat(1,1), mat(1,2), mat(1,3)); \
+  ROS_DEBUG("%f %f %f %f", mat(2,0), mat(2,1), mat(2,2), mat(2,3)); \
+  ROS_DEBUG("%f %f %f %f", mat(3,0), mat(3,1), mat(3,2), mat(3,3));
+
+void printStateError(const robot_state::RobotState &state, const std::string &str) {
+  const double *p;
+  p = state.getJointPositions("virtual_joint");
+  std::cerr << "(list " << str << " #f(" << 1000 * p[0] << " ";
+  std::cerr << 1000 * p[1] << " ";
+  std::cerr << 1000 * p[2] << ") #f(";
+  std::cerr << p[6] << " ";
+  std::cerr << p[3] << " ";
+  std::cerr << p[4] << " ";
+  std::cerr << p[5] << ") #f(";
+
+  p = state.getJointPositions("RLEG_JOINT0");
+  std::cerr << 180 / M_PI * p[0] << " ";
+  p = state.getJointPositions("RLEG_JOINT1");
+  std::cerr << 180 / M_PI * p[0] << " ";
+  p = state.getJointPositions("RLEG_JOINT2");
+  std::cerr << 180 / M_PI * p[0] << " ";
+  p = state.getJointPositions("RLEG_JOINT3");
+  std::cerr << 180 / M_PI * p[0] << " ";
+  p = state.getJointPositions("RLEG_JOINT4");
+  std::cerr << 180 / M_PI * p[0] << " ";
+  p = state.getJointPositions("RLEG_JOINT5");
+  std::cerr << 180 / M_PI * p[0] << " ";
+  p = state.getJointPositions("RLEG_JOINT6");
+  std::cerr << 180 / M_PI * p[0] << " ";
+
+  p = state.getJointPositions("LLEG_JOINT0");
+  std::cerr << 180 / M_PI * p[0] << " ";
+  p = state.getJointPositions("LLEG_JOINT1");
+  std::cerr << 180 / M_PI * p[0] << " ";
+  p = state.getJointPositions("LLEG_JOINT2");
+  std::cerr << 180 / M_PI * p[0] << " ";
+  p = state.getJointPositions("LLEG_JOINT3");
+  std::cerr << 180 / M_PI * p[0] << " ";
+  p = state.getJointPositions("LLEG_JOINT4");
+  std::cerr << 180 / M_PI * p[0] << " ";
+  p = state.getJointPositions("LLEG_JOINT5");
+  std::cerr << 180 / M_PI * p[0] << " ";
+  p = state.getJointPositions("LLEG_JOINT6");
+  std::cerr << 180 / M_PI * p[0] << " ";
+
+  p = state.getJointPositions("CHEST_JOINT0");
+  std::cerr << 180 / M_PI * p[0] << " ";
+  p = state.getJointPositions("CHEST_JOINT1");
+  std::cerr << 180 / M_PI * p[0] << " ";
+  p = state.getJointPositions("HEAD_JOINT0");
+  std::cerr << 180 / M_PI * p[0] << " ";
+  p = state.getJointPositions("HEAD_JOINT1");
+  std::cerr << 180 / M_PI * p[0] << " ";
+
+  p = state.getJointPositions("RARM_JOINT0");
+  std::cerr << 180 / M_PI * p[0] << " ";
+  p = state.getJointPositions("RARM_JOINT1");
+  std::cerr << 180 / M_PI * p[0] << " ";
+  p = state.getJointPositions("RARM_JOINT2");
+  std::cerr << 180 / M_PI * p[0] << " ";
+  p = state.getJointPositions("RARM_JOINT3");
+  std::cerr << 180 / M_PI * p[0] << " ";
+  p = state.getJointPositions("RARM_JOINT4");
+  std::cerr << 180 / M_PI * p[0] << " ";
+  p = state.getJointPositions("RARM_JOINT5");
+  std::cerr << 180 / M_PI * p[0] << " ";
+  p = state.getJointPositions("RARM_JOINT6");
+  std::cerr << 180 / M_PI * p[0] << " ";
+  std::cerr << "0 "; // RARM_JOINT7
+  p = state.getJointPositions("LARM_JOINT0");
+  std::cerr << 180 / M_PI * p[0] << " ";
+  p = state.getJointPositions("LARM_JOINT1");
+  std::cerr << 180 / M_PI * p[0] << " ";
+  p = state.getJointPositions("LARM_JOINT2");
+  std::cerr << 180 / M_PI * p[0] << " ";
+  p = state.getJointPositions("LARM_JOINT3");
+  std::cerr << 180 / M_PI * p[0] << " ";
+  p = state.getJointPositions("LARM_JOINT4");
+  std::cerr << 180 / M_PI * p[0] << " ";
+  p = state.getJointPositions("LARM_JOINT5");
+  std::cerr << 180 / M_PI * p[0] << " ";
+  p = state.getJointPositions("LARM_JOINT6");
+  std::cerr << 180 / M_PI * p[0] << " ";
+
+  std::cerr << "0))" << std::endl;  // LARM_JOINT7
+}
 
 bool HRP2JSKNTConstraintSampler::configure(const moveit_msgs::Constraints &constr)
 {
@@ -52,7 +158,7 @@ bool HRP2JSKNTConstraintSampler::configure(const moveit_msgs::Constraints &const
 
   logError("Configure joint constraint sampler");
 
-  ROS_ERROR_STREAM("constraints: " << constraints);
+  MYDEBUG_STREAM("constraints: " << constraints);
   // HRP2JSKNT custom constraints: define here --------------------
   moveit_msgs::JointConstraint jc1;
   moveit_msgs::OrientationConstraint oc1;
@@ -255,91 +361,6 @@ bool HRP2JSKNTConstraintSampler::configure(const std::vector<kinematic_constrain
   return true;
 }
 
-void printState(const robot_state::RobotState &state, const std::string &str) {
-  {
-    const double *p;
-    p = state.getJointPositions("virtual_joint");
-    std::cerr << "(list " << str << " #f(" << 1000 * p[0] << " ";
-    std::cerr << 1000 * p[1] << " ";
-    std::cerr << 1000 * p[2] << ") #f(";
-    std::cerr << p[6] << " ";
-    std::cerr << p[3] << " ";
-    std::cerr << p[4] << " ";
-    std::cerr << p[5] << ") #f(";
-
-    p = state.getJointPositions("RLEG_JOINT0");
-    std::cerr << 180 / M_PI * p[0] << " ";
-    p = state.getJointPositions("RLEG_JOINT1");
-    std::cerr << 180 / M_PI * p[0] << " ";
-    p = state.getJointPositions("RLEG_JOINT2");
-    std::cerr << 180 / M_PI * p[0] << " ";
-    p = state.getJointPositions("RLEG_JOINT3");
-    std::cerr << 180 / M_PI * p[0] << " ";
-    p = state.getJointPositions("RLEG_JOINT4");
-    std::cerr << 180 / M_PI * p[0] << " ";
-    p = state.getJointPositions("RLEG_JOINT5");
-    std::cerr << 180 / M_PI * p[0] << " ";
-    p = state.getJointPositions("RLEG_JOINT6");
-    std::cerr << 180 / M_PI * p[0] << " ";
-
-    p = state.getJointPositions("LLEG_JOINT0");
-    std::cerr << 180 / M_PI * p[0] << " ";
-    p = state.getJointPositions("LLEG_JOINT1");
-    std::cerr << 180 / M_PI * p[0] << " ";
-    p = state.getJointPositions("LLEG_JOINT2");
-    std::cerr << 180 / M_PI * p[0] << " ";
-    p = state.getJointPositions("LLEG_JOINT3");
-    std::cerr << 180 / M_PI * p[0] << " ";
-    p = state.getJointPositions("LLEG_JOINT4");
-    std::cerr << 180 / M_PI * p[0] << " ";
-    p = state.getJointPositions("LLEG_JOINT5");
-    std::cerr << 180 / M_PI * p[0] << " ";
-    p = state.getJointPositions("LLEG_JOINT6");
-    std::cerr << 180 / M_PI * p[0] << " ";
-
-    p = state.getJointPositions("CHEST_JOINT0");
-    std::cerr << 180 / M_PI * p[0] << " ";
-    p = state.getJointPositions("CHEST_JOINT1");
-    std::cerr << 180 / M_PI * p[0] << " ";
-    p = state.getJointPositions("HEAD_JOINT0");
-    std::cerr << 180 / M_PI * p[0] << " ";
-    p = state.getJointPositions("HEAD_JOINT1");
-    std::cerr << 180 / M_PI * p[0] << " ";
-
-    p = state.getJointPositions("RARM_JOINT0");
-    std::cerr << 180 / M_PI * p[0] << " ";
-    p = state.getJointPositions("RARM_JOINT1");
-    std::cerr << 180 / M_PI * p[0] << " ";
-    p = state.getJointPositions("RARM_JOINT2");
-    std::cerr << 180 / M_PI * p[0] << " ";
-    p = state.getJointPositions("RARM_JOINT3");
-    std::cerr << 180 / M_PI * p[0] << " ";
-    p = state.getJointPositions("RARM_JOINT4");
-    std::cerr << 180 / M_PI * p[0] << " ";
-    p = state.getJointPositions("RARM_JOINT5");
-    std::cerr << 180 / M_PI * p[0] << " ";
-    p = state.getJointPositions("RARM_JOINT6");
-    std::cerr << 180 / M_PI * p[0] << " ";
-    std::cerr << "0 "; // RARM_JOINT7
-    p = state.getJointPositions("LARM_JOINT0");
-    std::cerr << 180 / M_PI * p[0] << " ";
-    p = state.getJointPositions("LARM_JOINT1");
-    std::cerr << 180 / M_PI * p[0] << " ";
-    p = state.getJointPositions("LARM_JOINT2");
-    std::cerr << 180 / M_PI * p[0] << " ";
-    p = state.getJointPositions("LARM_JOINT3");
-    std::cerr << 180 / M_PI * p[0] << " ";
-    p = state.getJointPositions("LARM_JOINT4");
-    std::cerr << 180 / M_PI * p[0] << " ";
-    p = state.getJointPositions("LARM_JOINT5");
-    std::cerr << 180 / M_PI * p[0] << " ";
-    p = state.getJointPositions("LARM_JOINT6");
-    std::cerr << 180 / M_PI * p[0] << " ";
-
-    std::cerr << "0))" << std::endl;  // LARM_JOINT7
-  }
-}
-
 bool HRP2JSKNTConstraintSampler::sample(robot_state::RobotState &state,
                                         const robot_state::RobotState &reference_state,
                                         unsigned int max_attempts)
@@ -465,7 +486,6 @@ bool HRP2JSKNTConstraintSampler::sampleOrientationConstraints(robot_state::Robot
     quat = Eigen::Quaterniond(rt.rotation());
   }
 
-  ROS_ERROR("rot: %f %f %f %f", quat.w(), quat.x(), quat.y(), quat.z());
   // Now set the virtual joint quaternion to this result
   state.setVariablePosition("virtual_joint/rot_x", quat.x());
   state.setVariablePosition("virtual_joint/rot_y", quat.y());
@@ -474,13 +494,6 @@ bool HRP2JSKNTConstraintSampler::sampleOrientationConstraints(robot_state::Robot
 
   return true;
 }
-
-#define printEigenMat(str, mat) \
-  ROS_ERROR(str); \
-  ROS_ERROR("%f %f %f %f", mat(0,0), mat(0,1), mat(0,2), mat(0,3)); \
-  ROS_ERROR("%f %f %f %f", mat(1,0), mat(1,1), mat(1,2), mat(1,3)); \
-  ROS_ERROR("%f %f %f %f", mat(2,0), mat(2,1), mat(2,2), mat(2,3)); \
-  ROS_ERROR("%f %f %f %f", mat(3,0), mat(3,1), mat(3,2), mat(3,3));
 
 bool HRP2JSKNTConstraintSampler::calculateLegJoints(robot_state::RobotState &state,
                                                     const robot_state::RobotState &reference_state,
@@ -502,14 +515,12 @@ bool HRP2JSKNTConstraintSampler::calculateLegJoints(robot_state::RobotState &sta
   printEigenMat("left_foot_new_", left_foot_position_new_);
 
   // solve for one leg
-  //if (state.setFromIK(left_leg_, left_foot_position_new_, max_attempts, 0.1))
-  if (state.setFromIK(left_leg_, left_foot_position_, max_attempts, 0.04))
+  if (state.setFromIK(left_leg_, left_foot_position_, max_attempts, 0.1))
   {
     //logInform("Found IK Solution for left!");
 
     // solve for other leg
-    //if (state.setFromIK(right_leg_, right_foot_position_new_, max_attempts, 0.1))
-    if (state.setFromIK(right_leg_, right_foot_position_, max_attempts, 0.04))
+    if (state.setFromIK(right_leg_, right_foot_position_, max_attempts, 0.1))
     {
       logInform("Found IK Solution for BOTH!");
     }
@@ -524,6 +535,7 @@ bool HRP2JSKNTConstraintSampler::calculateLegJoints(robot_state::RobotState &sta
     logError("Did not find IK solution with %d attempts", max_attempts);
     return false;
   }
+
 #if 1
   // test ik server / ....
   moveit_msgs::GetPositionIK ik_srv;
@@ -531,7 +543,7 @@ bool HRP2JSKNTConstraintSampler::calculateLegJoints(robot_state::RobotState &sta
   ik_srv.request.ik_request.group_name = "whole_body";
 
   // Copy seed state into virtual robot state and convert into moveit_msg
-  moveit::core::robotStateToRobotStateMsg(reference_state, ik_srv.request.ik_request.robot_state);
+  moveit::core::robotStateToRobotStateMsg(state, ik_srv.request.ik_request.robot_state);
 
   // Load the poses into the request in difference places depending if there is more than one or not
   geometry_msgs::PoseStamped ik_pose_st;
@@ -544,7 +556,6 @@ bool HRP2JSKNTConstraintSampler::calculateLegJoints(robot_state::RobotState &sta
   const Eigen::Affine3d e_body = state.getGlobalLinkTransform("BODY");
 
   printEigenMat("rcds", e_rcds);
-  //printEigenMat("e_odom", e_odom);
   printEigenMat("e_body", e_body);
 
   geometry_msgs::Pose rcds, lcds;
@@ -578,6 +589,27 @@ bool HRP2JSKNTConstraintSampler::calculateLegJoints(robot_state::RobotState &sta
     }
     return false;
   }
+
+  MYDEBUG_STREAM("request:" << state);
+  MYDEBUG_STREAM("solution:" << ik_srv.response.solution);
+  for(size_t i = 0; i < ik_srv.response.solution.joint_state.name.size(); i++) {
+    state.setVariablePosition(ik_srv.response.solution.joint_state.name[i],
+                              ik_srv.response.solution.joint_state.position[i]);
+  }
+  {
+    // use first one...
+    std::string jname = ik_srv.response.solution.multi_dof_joint_state.joint_names[0];
+    geometry_msgs::Vector3 trs = ik_srv.response.solution.multi_dof_joint_state.transforms[0].translation;
+    geometry_msgs::Quaternion quat = ik_srv.response.solution.multi_dof_joint_state.transforms[0].rotation;
+    state.setVariablePosition(jname + "/trans_x", trs.x);
+    state.setVariablePosition(jname + "/trans_y", trs.y);
+    state.setVariablePosition(jname + "/trans_z", trs.z);
+    state.setVariablePosition(jname + "/rot_x", quat.x);
+    state.setVariablePosition(jname + "/rot_y", quat.y);
+    state.setVariablePosition(jname + "/rot_z", quat.z);
+    state.setVariablePosition(jname + "/rot_w", quat.w);
+  }
+  MYDEBUG_STREAM("final:" << state);
 #endif
 
   return true;
