@@ -1,0 +1,16 @@
+<launch>
+  <param name="lhand_robot_description"
+         textfile="$(find hrpsys_gazebo_tutorials)/robot_models/HRP3HAND_L/HRP3HAND_L.urdf" />
+  <param name="rhand_robot_description"
+         textfile="$(find hrpsys_gazebo_tutorials)/robot_models/HRP3HAND_R/HRP3HAND_R.urdf" />
+  <node pkg="joint_state_publisher"
+        type="joint_state_publisher"
+        name="lhand_joint_state_publisher" >
+    <remap from="robot_description" to="lhand_robot_description" />
+  </node>
+  <node pkg="joint_state_publisher"
+        type="joint_state_publisher"
+        name="rhand_joint_state_publisher" >
+    <remap from="robot_description" to="rhand_robot_description" />
+  </node>
+</launch>

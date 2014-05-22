@@ -12,4 +12,6 @@
     <arg name="PUBLISH_BASE_TF" value="false" />
   </include>
 
+  <include if    ="$(arg REAL)"
+           file="$(find hrp2jsknt_moveit_config)/launch/dummy_hand_state_publisher.launch" />
 </launch>
