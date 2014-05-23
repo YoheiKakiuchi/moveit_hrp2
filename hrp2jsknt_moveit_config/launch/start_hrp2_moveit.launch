@@ -11,4 +11,10 @@
            file="$(find hrp2jsknt_moveit_config)/launch/demo.launch">
     <arg name="PUBLISH_BASE_TF" value="false" />
   </include>
+
+  <node if    ="$(arg REAL)"
+        pkg="pr2eus_moveit"
+        type="publish-hrp2-moveit-base.l"
+        name="publish_moveit_base_tf" />
+
 </launch>
